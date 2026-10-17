@@ -4,74 +4,69 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Preflight"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Preflight"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#4d148c">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-180.png">
 <title>777 Preflight</title>
 <style>
 /* Layout: cockpit card — sticky header with leg info + progress, two columns (briefings | paperwork) on iPad, stacked on phone */
 :root {
-  --bg: #eef1f4;
-  --panel: #ffffff;
-  --ink: #18202a;
-  --muted: #5d6875;
-  --line: #d5dbe2;
-  --accent: #4d148c;        /* tick fill */
-  --accent-ink: #ffffff;
-  --done: #2f7d4f;
-  --na: #8a6d1f;
-  --na-bg: #f6edd4;
-  --hover: #f3f5f8;
+  --bg: #f3f0f8; --panel: #ffffff; --ink: #1d1530; --muted: #6a6080; --line: #ddd6ea;
+  --accent: #4d148c; --accent-ink: #ffffff; --done: #2f7d4f; --na: #8a6d1f; --na-bg: #f6edd4; --hover: #f7f4fb;
+  --bar: #4d148c; --bar-ink: #ffffff; --bar-muted: #d6c6ef; --bar-field: rgba(255,255,255,.14); --bar-line: rgba(255,255,255,.32); --bar-done: #9fe5bb;
   --display: -apple-system, "SF Pro Display", system-ui, sans-serif;
   --body: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0d1117; --panel: #161c24; --ink: #e4e8ee; --muted: #8e99a6; --line: #2a333e;
-    --accent: #9a6fd6; --accent-ink: #0d1117; --done: #5cc58a; --na: #d8b65a; --na-bg: #2e2716; --hover: #1d2530;
+    --bg: #110b1a; --panel: #1a1326; --ink: #e6dff1; --muted: #9d92b2; --line: #2d2440;
+    --accent: #a57ce0; --accent-ink: #110b1a; --done: #5cc58a; --na: #d8b65a; --na-bg: #2e2716; --hover: #221a31;
+    --bar: #2a1650; --bar-ink: #ece5f8; --bar-muted: #b4a2d6; --bar-field: rgba(255,255,255,.08); --bar-line: rgba(255,255,255,.18); --bar-done: #5cc58a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0d1117; --panel: #161c24; --ink: #e4e8ee; --muted: #8e99a6; --line: #2a333e;
-  --accent: #9a6fd6; --accent-ink: #0d1117; --done: #5cc58a; --na: #d8b65a; --na-bg: #2e2716; --hover: #1d2530;
-  color-scheme: dark;
+    --bg: #110b1a; --panel: #1a1326; --ink: #e6dff1; --muted: #9d92b2; --line: #2d2440;
+    --accent: #a57ce0; --accent-ink: #110b1a; --done: #5cc58a; --na: #d8b65a; --na-bg: #2e2716; --hover: #221a31;
+    --bar: #2a1650; --bar-ink: #ece5f8; --bar-muted: #b4a2d6; --bar-field: rgba(255,255,255,.08); --bar-line: rgba(255,255,255,.18); --bar-done: #5cc58a;
+    color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.35;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
   margin: 0;
   padding-block: 0 calc(32px + env(safe-area-inset-bottom, 0px));
   font-size: 17px;
   -webkit-tap-highlight-color: transparent;
 }
-.wrap { max-width: 1180px; margin: 0 auto; }
+.wrap, .bar-in { max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { padding-block: 16px 0; }
 
-header {
-  position: sticky; top: 0; z-index: 5;
-  background: var(--bg); padding-block: calc(14px + env(safe-area-inset-top, 0px)) 12px; border-bottom: 1px solid var(--line);
-  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
-}
+header { position: sticky; top: 0; z-index: 5; background: var(--bar); color: var(--bar-ink); }
+.bar-in { padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 h1 { font-family: var(--display); font-weight: 700; font-size: 1.7rem; letter-spacing: .02em; margin: 0; text-transform: uppercase; }
 .leg { display: flex; align-items: center; gap: 8px; }
-.leg label { font-family: var(--display); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-size: .95rem; }
+.leg label { font-family: var(--display); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--bar-muted); font-size: .95rem; }
 .leg input {
   font: 700 1.1rem var(--body); width: 7.5em; padding: 8px 10px; border-radius: 8px;
-  border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-transform: uppercase;
+  border: 1px solid var(--bar-line); background: var(--bar-field); color: var(--bar-ink); text-transform: uppercase;
 }
 .total { margin-left: auto; display: flex; align-items: center; gap: 14px; }
 .total .num { font-family: var(--display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.total .num.all { color: var(--done); }
+.total .num.all { color: var(--bar-done); }
+.leg input::placeholder { color: var(--bar-muted); }
 .reset {
-  font: 700 .95rem var(--body); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line);
-  background: var(--panel); color: var(--ink); cursor: pointer; min-height: 44px;
+  font: 700 .95rem var(--body); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--bar-line);
+  background: var(--bar-field); color: var(--bar-ink); cursor: pointer; min-height: 44px;
 }
+.mode { display: inline-flex; align-items: center; gap: 8px; }
+.mode svg { width: 18px; height: 18px; }
 .reset.arm { background: #b3261e; border-color: #b3261e; color: #fff; }
 
-main { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 16px; }
+main { display: grid; grid-template-columns: 1fr; gap: 18px; }
 @media (min-width: 760px) { main { grid-template-columns: 1fr 1fr; } }
 
 section { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; min-width: 0; overflow: hidden; }
@@ -83,13 +78,15 @@ h2 { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-s
 
 ul { list-style: none; margin: 0; padding: 0; }
 .row { display: flex; align-items: stretch; border-top: 1px solid var(--line); }
+.sec-head { border-top: 4px solid var(--accent); }
 .group-label + ul > .row:first-child, .sec-head + ul > .row:first-child { border-top: 0; }
 .tick {
   flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 12px 16px; min-height: 58px;
   background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .tick:hover { background: var(--hover); }
-.tick:focus-visible, .na:focus-visible, .reset:focus-visible, .expand:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.tick:focus-visible, .na:focus-visible, .reset:focus-visible, .leg input:focus-visible, .expand:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+header .reset:focus-visible, header input:focus-visible { outline-color: var(--bar-ink); outline-offset: 2px; }
 .box {
   flex: none; width: 30px; height: 30px; border-radius: 7px; border: 2.5px solid var(--muted);
   display: grid; place-items: center; transition: background .12s, border-color .12s;
@@ -128,8 +125,8 @@ h1, h2, .count, .total .num { letter-spacing: .04em; }
 </head>
 <body>
 
-<div class="wrap">
-  <header>
+<header>
+  <div class="bar-in">
     <h1>777 Preflight</h1>
     <div class="leg">
       <label for="flt">Flight</label>
@@ -137,9 +134,13 @@ h1, h2, .count, .total .num { letter-spacing: .04em; }
     </div>
     <div class="total">
       <span class="num" id="totalNum">0/0</span>
+      <button class="reset mode" id="mode" type="button"></button>
       <button class="reset" id="reset" type="button">Reset for next leg</button>
     </div>
-  </header>
+  </div>
+</header>
+
+<div class="wrap">
 
   <main>
     <section aria-labelledby="hB">
@@ -157,7 +158,6 @@ h1, h2, .count, .total .num { letter-spacing: .04em; }
 <script>
 const BRIEFINGS = [
   { label: null, items: [
-    { id: "perf", name: "Performance Briefing", ref: "FM p. 125 · before Before Start checklist" },
     { id: "crew", name: "Crew Briefing", ref: "FOM 3.06 · 13.03", subs: [
       ["c1", "Flight info: flight number, whose leg, ETOPS and/or redispatch"],
       ["c2", "Threats"],
@@ -169,6 +169,7 @@ const BRIEFINGS = [
       ["c8", "Special operations procedures for the leg"],
       ["c9", "Document security"]
     ]},
+    { id: "perf", name: "Performance Briefing", ref: "FM p. 125 · before Before Start checklist" },
     { id: "dep", name: "Departure Briefing", ref: "FOM 4.33 · before engine start" }
   ]},
   { label: "If applicable", items: [
@@ -306,6 +307,22 @@ function update() {
 }
 function setCount(id, d, t) { const el = document.getElementById(id); el.textContent = d + "/" + t; el.classList.toggle("all", d === t); }
 
+const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>';
+const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+const modeBtn = document.getElementById("mode");
+const sysDark = window.matchMedia("(prefers-color-scheme: dark)");
+function isNight() { return state.theme ? state.theme === "dark" : sysDark.matches; }
+function applyTheme() {
+  if (state.theme) document.documentElement.dataset.theme = state.theme; else delete document.documentElement.dataset.theme;
+  const night = isNight();
+  modeBtn.innerHTML = (night ? SUN : MOON) + "<span>" + (night ? "Day" : "Night") + "</span>";
+  modeBtn.setAttribute("aria-label", night ? "Switch to day mode" : "Switch to night mode");
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", night ? "#2a1650" : "#4d148c");
+}
+modeBtn.addEventListener("click", () => { state.theme = isNight() ? "light" : "dark"; save(); applyTheme(); });
+sysDark.addEventListener && sysDark.addEventListener("change", applyTheme);
+applyTheme();
+
 render(document.getElementById("briefings"), BRIEFINGS);
 render(document.getElementById("paperwork"), PAPERWORK);
 const flt = document.getElementById("flt");
@@ -321,7 +338,7 @@ reset.addEventListener("click", () => {
     return;
   }
   clearTimeout(armTimer);
-  state = { t: {}, n: {}, open: state.open, flt: "" };
+  state = { t: {}, n: {}, open: state.open, flt: "", theme: state.theme };
   flt.value = ""; save(); update(); disarm();
 });
 function disarm() { reset.classList.remove("arm"); reset.textContent = "Reset for next leg"; }
