@@ -117,6 +117,10 @@ header .reset:focus-visible, header input:focus-visible { outline-color: var(--b
 .subs .box { width: 24px; height: 24px; border-width: 2px; }
 .subs .box svg { width: 16px; height: 16px; }
 .subs .name { font-weight: 400; }
+.times { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 0 16px 12px 74px; }
+.times label { display: flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--muted); }
+.times input { width: 6.5em; font: inherit; font-size: 1rem; font-variant-numeric: tabular-nums; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; text-transform: uppercase; }
+.times input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 footer { margin-top: 18px; font-size: .8rem; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .box { transition: none; } }
 [hidden] { display: none !important; }
@@ -152,7 +156,7 @@ h1, h2, .count, .total .num { letter-spacing: .04em; }
       <div id="paperwork"></div>
     </section>
   </main>
-  <footer>FOM Rev 83 · 777 FM Rev 18. Ticks are saved on this iPad and work offline. Mark an item N/A when it doesn't apply to this leg.</footer>
+  <footer>FOM Rev 83 · 777 FM Rev 18. Ticks and times are saved on this iPad and work offline. Mark an item N/A when it doesn't apply to this leg.</footer>
 </div>
 
 <script>
@@ -161,6 +165,7 @@ const BRIEFINGS = [
     { id: "crew", name: "Crew Briefing", ref: "FOM 3.06 · 13.03", subs: [
       ["c1", "Flight info: flight number, whose leg, ETOPS and/or redispatch"],
       ["c2", "Threats"],
+      ["c10", "MTOB / aircraft T/O By time (more restrictive)", true],
       ["c3", "Deviations from FedEx standard procedures"],
       ["c4", "Emergency on takeoff"],
       ["c5", "HUD"],
@@ -189,16 +194,19 @@ const PAPERWORK = [
     { id: "fuel", name: "Fuel Slip / eFuel Slip", ref: "FOM 3.51" },
     { id: "prelim", name: "Preliminary W&B", ref: "FOM 4.21" },
     { id: "final", name: "Final W&B", ref: "FOM 3.51 · 4.21" },
-    { id: "dg", name: "Dangerous Goods", ref: "FOM 3.51", na: true },
+    { id: "dg", name: "Dangerous Goods", ref: "FOM 3.51" },
     { id: "pdc", name: "PDC" },
     { id: "lrn", name: "LRN", na: true }
   ]}
 ];
 
 const KEY = "fdx777-preflight-v1";
-let state = { t: {}, n: {}, open: {}, flt: "" };
+let state = { t: {}, n: {}, open: {}, flt: "", mt: {} };
 try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) state = Object.assign(state, s); } catch (e) {}
+if (!state.mt) state.mt = {};
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+// Ask iOS to keep this app's storage; a Home Screen app's storage is already exempt from Safari's 7-day cleanup.
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-ink)"/></svg>';
 
@@ -258,7 +266,7 @@ function rowFor(item) {
   if (item.subs) {
     const sub = document.createElement("ul");
     sub.className = "subs"; sub.id = "s-" + item.id;
-    for (const [sid, sname] of item.subs) {
+    for (const [sid, sname, times] of item.subs) {
       const sli = document.createElement("li");
       const srow = document.createElement("div");
       srow.className = "row"; srow.dataset.id = sid;
@@ -267,7 +275,21 @@ function rowFor(item) {
       sb.innerHTML = '<span class="box">' + CHECK + '</span><span class="label"><span class="name"></span></span>';
       sb.querySelector(".name").textContent = sname;
       sb.addEventListener("click", () => { state.t[sid] = !state.t[sid]; save(); update(); });
-      srow.appendChild(sb); sli.appendChild(srow); sub.appendChild(sli);
+      srow.appendChild(sb); sli.appendChild(srow);
+      if (times) {
+        const tw = document.createElement("div");
+        tw.className = "times";
+        for (const [k, lbl] of [["crew", "Crew MTOB"], ["ac", "Aircraft T/O By"]]) {
+          const l = document.createElement("label");
+          const inp = document.createElement("input");
+          inp.id = "mt-" + k; inp.type = "text"; inp.inputMode = "numeric"; inp.autocomplete = "off"; inp.placeholder = "HHMMZ"; inp.maxLength = 6;
+          inp.value = state.mt[k] || "";
+          inp.addEventListener("input", () => { state.mt[k] = inp.value; save(); });
+          l.htmlFor = inp.id; l.append(lbl, inp); tw.appendChild(l);
+        }
+        sli.appendChild(tw);
+      }
+      sub.appendChild(sli);
     }
     li.appendChild(sub);
   }
@@ -338,8 +360,8 @@ reset.addEventListener("click", () => {
     return;
   }
   clearTimeout(armTimer);
-  state = { t: {}, n: {}, open: state.open, flt: "", theme: state.theme };
-  flt.value = ""; save(); update(); disarm();
+  state = { t: {}, n: {}, open: state.open, flt: "", mt: {}, theme: state.theme };
+  flt.value = ""; document.querySelectorAll(".times input").forEach(i => { i.value = ""; }); save(); update(); disarm();
 });
 function disarm() { reset.classList.remove("arm"); reset.textContent = "Reset for next leg"; }
 
