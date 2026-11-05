@@ -50,14 +50,18 @@ header { position: sticky; top: 0; z-index: 5; background: var(--bar); color: va
 h1 { font-family: var(--display); font-weight: 700; font-size: 1.7rem; letter-spacing: .02em; margin: 0; text-transform: uppercase; }
 .leg { display: flex; align-items: center; gap: 8px; }
 .leg label { font-family: var(--display); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--bar-muted); font-size: .95rem; }
-.leg input {
-  font: 700 1.1rem var(--body); width: 7.5em; padding: 8px 10px; border-radius: 8px;
-  border: 1px solid var(--bar-line); background: var(--bar-field); color: var(--bar-ink); text-transform: uppercase;
+.fltbox {
+  display: flex; align-items: baseline; gap: .3em; padding: 2px 10px; border-radius: 8px;
+  border: 1px solid var(--bar-line); background: var(--bar-field); cursor: text;
 }
+.fltbox span, .fltbox input { font-family: var(--display); font-weight: 700; font-size: 1.7rem; letter-spacing: .02em; text-transform: uppercase; color: var(--bar-ink); }
+.fltbox input { width: 3.4em; padding: 0; border: 0; background: transparent; font-variant-numeric: tabular-nums; }
+.fltbox input:focus { outline: none; }
+.fltbox:focus-within { outline: 2px solid var(--bar-ink); outline-offset: 2px; }
 .total { margin-left: auto; display: flex; align-items: center; gap: 14px; }
 .total .num { font-family: var(--display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .total .num.all { color: var(--bar-done); }
-.leg input::placeholder { color: var(--bar-muted); }
+.fltbox input::placeholder { color: var(--bar-muted); }
 .reset {
   font: 700 .95rem var(--body); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--bar-line);
   background: var(--bar-field); color: var(--bar-ink); cursor: pointer; min-height: 44px;
@@ -85,8 +89,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .tick:hover { background: var(--hover); }
-.tick:focus-visible, .na:focus-visible, .reset:focus-visible, .leg input:focus-visible, .expand:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
-header .reset:focus-visible, header input:focus-visible { outline-color: var(--bar-ink); outline-offset: 2px; }
+.tick:focus-visible, .na:focus-visible, .reset:focus-visible, .expand:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+header .reset:focus-visible { outline-color: var(--bar-ink); outline-offset: 2px; }
 .box {
   flex: none; width: 30px; height: 30px; border-radius: 7px; border: 2.5px solid var(--muted);
   display: grid; place-items: center; transition: background .12s, border-color .12s;
@@ -134,7 +138,7 @@ h1, h2, .count, .total .num { letter-spacing: .04em; }
     <h1>777 Preflight</h1>
     <div class="leg">
       <label for="flt">Flight</label>
-      <input id="flt" type="text" inputmode="text" autocomplete="off" placeholder="FDX ____">
+      <span class="fltbox"><span aria-hidden="true">FDX</span><input id="flt" type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="____"></span>
     </div>
     <div class="total">
       <span class="num" id="totalNum">0/0</span>
@@ -349,8 +353,10 @@ applyTheme();
 render(document.getElementById("briefings"), BRIEFINGS);
 render(document.getElementById("paperwork"), PAPERWORK);
 const flt = document.getElementById("flt");
-flt.value = state.flt || "";
+state.flt = (state.flt || "").replace(/^\s*FDX\s*/i, "");
+flt.value = state.flt;
 flt.addEventListener("input", () => { state.flt = flt.value; save(); });
+document.querySelector(".fltbox").addEventListener("click", () => flt.focus());
 
 const reset = document.getElementById("reset");
 let armTimer = null;
